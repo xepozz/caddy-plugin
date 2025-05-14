@@ -1,6 +1,6 @@
 <!-- Keep a Changelog guide -> https://keepachangelog.com -->
 
-# caddy-plugin Changelog
+# Caddyfile Changelog
 
 ## [Unreleased]
 ### Added
