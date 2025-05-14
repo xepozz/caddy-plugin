@@ -1,0 +1,67 @@
+{
+  parserClass="com.github.xepozz.caddy.language.parser.CaddyParser"
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="Caddy"
+  psiImplClassSuffix="Impl"
+  psiPackage="com.github.xepozz.caddy.language.psi"
+  psiImplPackage="com.github.xepozz.caddy.language.psi.impl"
+
+  elementTypeHolderClass="com.github.xepozz.caddy.language.psi.CaddyTypes"
+  elementTypeClass="com.github.xepozz.caddy.language.psi.CaddyElementType"
+  tokenTypeClass="com.github.xepozz.caddy.language.psi.CaddyTokenType"
+
+  tokens = [
+    LBRACE = "LBRACE {"
+    RBRACE = "RBRACE }"
+    LPAREN = "LPAREN ("
+    RPAREN = "RPAREN )"
+    LBRACKET = "LBRACKET ["
+    RBRACKET = "RBRACKET ]"
+    COMMENT = "COMMENT"
+    EOL = "EOL"
+    IDENTIFIER = "IDENTIFIER"
+    NUMBER = "NUMBER"
+    TEXT = "TEXT"
+  ]
+}
+
+// Top level structure
+caddyFile ::= item_*
+
+private item_ ::= named_block | block | COMMENT | EOL
+
+named_block ::= block_name block
+
+block_name ::= (LPAREN IDENTIFIER RPAREN) | IDENTIFIER
+
+block ::= LBRACE EOL instructions RBRACE
+{
+//  recoverWhile=block_recover
+}
+private block_recover ::= !(COMMENT | IDENTIFIER | RBRACE | EOL)
+
+private instructions ::= (instruction? EOL)*
+
+instruction ::= directive | COMMENT
+{
+//  recoverWhile=instruction_recover
+}
+
+private instruction_recover ::= !(COMMENT | IDENTIFIER | EOL)
+
+directive ::= IDENTIFIER argument* block?
+{
+  pin=1
+}
+
+argument ::= simple_value | env_value
+
+simple_value ::= TEXT | NUMBER | IDENTIFIER
+
+env_value ::= LBRACE (TEXT|IDENTIFIER) RBRACE
+{
+  pin=2
+}
+
+//private instruction_recover ::= !(TEXT | RBRACE)

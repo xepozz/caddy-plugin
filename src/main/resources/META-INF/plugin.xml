@@ -9,8 +9,6 @@
     <resource-bundle>messages.CaddyBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow factoryClass="com.github.xepozz.caddyplugin.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
-        <postStartupActivity implementation="com.github.xepozz.caddyplugin.startup.MyProjectActivity" />
         <fileType
                 name="Caddyfile"
                 implementationClass="com.github.xepozz.caddy.language.CaddyFileType"
@@ -19,5 +17,22 @@
                 fileNames="Caddyfile"
                 patterns="*.Caddyfile;Caddyfile.*"
         />
+        <lang.parserDefinition
+                language="Caddyfile"
+                implementationClass="com.github.xepozz.caddy.language.parser.CaddyParserDefinition"/>
+        <lang.syntaxHighlighterFactory
+                language="Caddyfile"
+                implementationClass="com.github.xepozz.caddy.language.CaddySyntaxHighlighterFactory"/>
+        <annotator
+                language="Caddyfile"
+                implementationClass="com.github.xepozz.caddy.language.CaddyAnnotator"/>
+
+        <lang.elementManipulator
+                forClass="com.github.xepozz.caddy.language.psi.impl.CaddyElementImpl"
+                implementationClass="com.github.xepozz.caddy.language.psi.CaddyElementManipulator"/>
+        <lang.braceMatcher
+                language="Caddyfile"
+                implementationClass="com.github.xepozz.caddy.language.CaddyBraceMatcher"/>
+
     </extensions>
 </idea-plugin>
