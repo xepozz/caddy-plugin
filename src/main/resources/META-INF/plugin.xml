@@ -11,5 +11,13 @@
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow factoryClass="com.github.xepozz.caddyplugin.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
         <postStartupActivity implementation="com.github.xepozz.caddyplugin.startup.MyProjectActivity" />
+        <fileType
+                name="Caddyfile"
+                implementationClass="com.github.xepozz.caddy.language.CaddyFileType"
+                extensions=""
+                language="Caddyfile"
+                fileNames="Caddyfile"
+                patterns="*.Caddyfile;Caddyfile.*"
+        />
     </extensions>
 </idea-plugin>
