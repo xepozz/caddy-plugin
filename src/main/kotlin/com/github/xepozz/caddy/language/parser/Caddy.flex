@@ -29,7 +29,7 @@ COMMENT = "#"[^\n]*
 // Identifier patterns
 IDENTIFIER = @?[a-zA-Z][a-zA-Z0-9_\-]*
 NUMBER = [0-9]+
-TEXT = [^\s{\}(\)\[\]<\>\|\#\"\'\`]+
+TEXT = [^\s{\}(\)\[\]<\>\|\#\"\'\`][^\s{\}(\)\[\]<\>]*
 
 // Special symbols
 LBRACE = "{"

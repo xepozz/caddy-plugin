@@ -1,37 +1,64 @@
 package com.github.xepozz.caddy.language
 
+import com.github.xepozz.caddy.language.psi.CaddyArgument
+import com.github.xepozz.caddy.language.psi.impl.CaddyDirectiveImpl
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
+import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors
 import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.psi.PsiElement
 
 class CaddyAnnotator : Annotator {
     override fun annotate(element: PsiElement, holder: AnnotationHolder) {
+        println("annotate $element")
         when (element) {
-//            is CaddyPattern -> {
-//                holder.newSilentAnnotation(HighlightSeverity.INFORMATION)
-//                    .range(element.textRange)
-//                    .textAttributes(PATTERN_HIGHLIGHT)
-//                    .create()
-//            }
-//
-//            is CaddyTeam -> {
-//                holder.newSilentAnnotation(HighlightSeverity.INFORMATION)
-//                    .range(element.textRange)
-//                    .textAttributes(PARAMETERS_HIGHLIGHT)
-//                    .create()
-//            }
+            is CaddyDirectiveImpl -> {
+                val nameElement = element.nameElement
+                when {
+                    nameElement.text.startsWith("@") -> {
+                        holder.newSilentAnnotation(HighlightSeverity.INFORMATION)
+                            .range(nameElement)
+                            .textAttributes(REFERENCE_DECLARATION_HIGHLIGHT)
+                            .create()
+                    }
+
+                    else -> {
+                        holder.newSilentAnnotation(HighlightSeverity.INFORMATION)
+                            .range(nameElement)
+                            .textAttributes(IDENTIFIER_HIGHLIGHT)
+                            .create()
+                    }
+                }
+            }
+
+            is CaddyArgument -> {
+                val text = element.simpleValue?.text ?: ""
+                if (text.startsWith("@")) {
+                    holder.newSilentAnnotation(HighlightSeverity.INFORMATION)
+                        .range(element.simpleValue!!)
+                        .textAttributes(REFERENCE_USAGE_HIGHLIGHT)
+                        .create()
+                }
+            }
         }
     }
 
     companion object {
         val PATTERN_HIGHLIGHT = TextAttributesKey.createTextAttributesKey(
-            "GITCODEOWNERS_PATTERN",
+            "CADDY_PATTERN",
             DefaultLanguageHighlighterColors.STRING,
         )
-        private val PARAMETERS_HIGHLIGHT = TextAttributesKey.createTextAttributesKey(
-            "GITCODEOWNERS_IDENTIFIER",
+        val REFERENCE_DECLARATION_HIGHLIGHT = TextAttributesKey.createTextAttributesKey(
+            "CADDY_PATTERN",
+            DefaultLanguageHighlighterColors.FUNCTION_DECLARATION,
+        )
+        val REFERENCE_USAGE_HIGHLIGHT = TextAttributesKey.createTextAttributesKey(
+            "CADDY_PATTERN",
+            DefaultLanguageHighlighterColors.FUNCTION_CALL,
+        )
+        private val IDENTIFIER_HIGHLIGHT = TextAttributesKey.createTextAttributesKey(
+            "CADDY_IDENTIFIER",
             DefaultLanguageHighlighterColors.KEYWORD,
         )
     }

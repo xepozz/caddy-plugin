@@ -8,10 +8,9 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static com.github.xepozz.caddy.language.psi.CaddyTypes.*;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.github.xepozz.caddy.language.psi.*;
 
-public class CaddyDirectiveImpl extends ASTWrapperPsiElement implements CaddyDirective {
+public class CaddyDirectiveImpl extends CaddyDirectiveBaseImpl implements CaddyDirective {
 
   public CaddyDirectiveImpl(@NotNull ASTNode node) {
     super(node);
