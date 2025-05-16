@@ -18,7 +18,7 @@
 
 <!-- Plugin description -->
 
-[GitHub](https://github.com/xepozz/caddy-plugin) | [Telegram](https://t.me/jb_plugins/) | [Donation](https://github.com/xepozz/xepozz?tab=readme-ov-file#become-a-sponsor)
+[GitHub](https://github.com/xepozz/caddy-plugin) | [Telegram](https://t.me/jb_plugins/42) | [Donation](https://github.com/xepozz/xepozz?tab=readme-ov-file#become-a-sponsor)
 
 ## Caddyfile syntax support
 
