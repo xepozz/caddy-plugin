@@ -36,6 +36,17 @@ public class CaddyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // IDENTIFIER | TEXT
+  static boolean address(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "address")) return false;
+    if (!nextTokenIs(b, "", IDENTIFIER, TEXT)) return false;
+    boolean r;
+    r = consumeToken(b, IDENTIFIER);
+    if (!r) r = consumeToken(b, TEXT);
+    return r;
+  }
+
+  /* ********************************************************** */
   // simple_value | env_value
   public static boolean argument(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "argument")) return false;
@@ -49,48 +60,38 @@ public class CaddyParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // LBRACE EOL instructions RBRACE
-  // {
-  // //  recoverWhile=block_recover
-  // }
   public static boolean block(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "block")) return false;
-    if (!nextTokenIs(b, LBRACE)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, LBRACE, EOL);
-    r = r && instructions(b, l + 1);
-    r = r && consumeToken(b, RBRACE);
-    r = r && block_4(b, l + 1);
-    exit_section_(b, m, BLOCK, r);
-    return r;
-  }
-
-  // {
-  // //  recoverWhile=block_recover
-  // }
-  private static boolean block_4(PsiBuilder b, int l) {
-    return true;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, BLOCK, "<block>");
+    r = consumeTokens(b, 2, LBRACE, EOL);
+    p = r; // pin = 2
+    r = r && report_error_(b, instructions(b, l + 1));
+    r = p && consumeToken(b, RBRACE) && r;
+    exit_section_(b, l, m, r, p, CaddyParser::block_recover);
+    return r || p;
   }
 
   /* ********************************************************** */
-  // (LPAREN IDENTIFIER RPAREN) | IDENTIFIER
+  // (LPAREN address RPAREN) | address
   public static boolean block_name(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "block_name")) return false;
-    if (!nextTokenIs(b, "<block name>", IDENTIFIER, LPAREN)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, BLOCK_NAME, "<block name>");
     r = block_name_0(b, l + 1);
-    if (!r) r = consumeToken(b, IDENTIFIER);
+    if (!r) r = address(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
 
-  // LPAREN IDENTIFIER RPAREN
+  // LPAREN address RPAREN
   private static boolean block_name_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "block_name_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, LPAREN, IDENTIFIER, RPAREN);
+    r = consumeToken(b, LPAREN);
+    r = r && address(b, l + 1);
+    r = r && consumeToken(b, RPAREN);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -133,14 +134,13 @@ public class CaddyParser implements PsiParser, LightPsiParser {
   // IDENTIFIER argument* block?
   public static boolean directive(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "directive")) return false;
-    if (!nextTokenIs(b, IDENTIFIER)) return false;
     boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, DIRECTIVE, null);
+    Marker m = enter_section_(b, l, _NONE_, DIRECTIVE, "<directive>");
     r = consumeToken(b, IDENTIFIER);
     p = r; // pin = 1
     r = r && report_error_(b, directive_1(b, l + 1));
     r = p && directive_2(b, l + 1) && r;
-    exit_section_(b, l, m, r, p, null);
+    exit_section_(b, l, m, r, p, CaddyParser::directive_recover);
     return r || p;
   }
 
@@ -160,6 +160,27 @@ public class CaddyParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "directive_2")) return false;
     block(b, l + 1);
     return true;
+  }
+
+  /* ********************************************************** */
+  // !(COMMENT | IDENTIFIER | EOL)
+  static boolean directive_recover(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "directive_recover")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NOT_);
+    r = !directive_recover_0(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // COMMENT | IDENTIFIER | EOL
+  private static boolean directive_recover_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "directive_recover_0")) return false;
+    boolean r;
+    r = consumeToken(b, COMMENT);
+    if (!r) r = consumeToken(b, IDENTIFIER);
+    if (!r) r = consumeToken(b, EOL);
+    return r;
   }
 
   /* ********************************************************** */
@@ -188,59 +209,14 @@ public class CaddyParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // directive | COMMENT
-  // {
-  // //  recoverWhile=instruction_recover
-  // }
   public static boolean instruction(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "instruction")) return false;
     if (!nextTokenIs(b, "<instruction>", COMMENT, IDENTIFIER)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, INSTRUCTION, "<instruction>");
     r = directive(b, l + 1);
-    if (!r) r = instruction_1(b, l + 1);
+    if (!r) r = consumeToken(b, COMMENT);
     exit_section_(b, l, m, r, false, null);
-    return r;
-  }
-
-  // COMMENT
-  // {
-  // //  recoverWhile=instruction_recover
-  // }
-  private static boolean instruction_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "instruction_1")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, COMMENT);
-    r = r && instruction_1_1(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // {
-  // //  recoverWhile=instruction_recover
-  // }
-  private static boolean instruction_1_1(PsiBuilder b, int l) {
-    return true;
-  }
-
-  /* ********************************************************** */
-  // !(COMMENT | IDENTIFIER | EOL)
-  static boolean instruction_recover(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "instruction_recover")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NOT_);
-    r = !instruction_recover_0(b, l + 1);
-    exit_section_(b, l, m, r, false, null);
-    return r;
-  }
-
-  // COMMENT | IDENTIFIER | EOL
-  private static boolean instruction_recover_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "instruction_recover_0")) return false;
-    boolean r;
-    r = consumeToken(b, COMMENT);
-    if (!r) r = consumeToken(b, IDENTIFIER);
-    if (!r) r = consumeToken(b, EOL);
     return r;
   }
 
@@ -279,10 +255,12 @@ public class CaddyParser implements PsiParser, LightPsiParser {
   static boolean item_(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "item_")) return false;
     boolean r;
+    Marker m = enter_section_(b);
     r = named_block(b, l + 1);
     if (!r) r = block(b, l + 1);
     if (!r) r = consumeToken(b, COMMENT);
     if (!r) r = consumeToken(b, EOL);
+    exit_section_(b, m, null, r);
     return r;
   }
 
@@ -290,7 +268,6 @@ public class CaddyParser implements PsiParser, LightPsiParser {
   // block_name block
   public static boolean named_block(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "named_block")) return false;
-    if (!nextTokenIs(b, "<named block>", IDENTIFIER, LPAREN)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, NAMED_BLOCK, "<named block>");
     r = block_name(b, l + 1);

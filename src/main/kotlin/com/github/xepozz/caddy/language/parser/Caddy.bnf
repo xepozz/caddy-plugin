@@ -33,27 +33,28 @@ private item_ ::= named_block | block | COMMENT | EOL
 
 named_block ::= block_name block
 
-block_name ::= (LPAREN IDENTIFIER RPAREN) | IDENTIFIER
+block_name ::= (LPAREN address RPAREN) | address
+private address ::= IDENTIFIER | TEXT
 
 block ::= LBRACE EOL instructions RBRACE
 {
-//  recoverWhile=block_recover
+  pin=2
+  recoverWhile=block_recover
 }
 private block_recover ::= !(COMMENT | IDENTIFIER | RBRACE | EOL)
 
 private instructions ::= (instruction? EOL)*
 
 instruction ::= directive | COMMENT
-{
-//  recoverWhile=instruction_recover
-}
-
-private instruction_recover ::= !(COMMENT | IDENTIFIER | EOL)
 
 directive ::= IDENTIFIER argument* block?
 {
   pin=1
+  recoverWhile=directive_recover
+  implements=["com.intellij.psi.NavigatablePsiElement" "com.intellij.psi.PsiNamedElement"]
+  extends="com.github.xepozz.caddy.language.psi.impl.CaddyDirectiveBaseImpl"
 }
+private directive_recover ::= !(COMMENT | IDENTIFIER | EOL)
 
 argument ::= simple_value | env_value
 

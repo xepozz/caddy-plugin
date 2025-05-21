@@ -13,6 +13,8 @@ class CaddySyntaxHighlighter : SyntaxHighlighterBase() {
     override fun getHighlightingLexer() = CaddyLexerAdapter()
 
     override fun getTokenHighlights(tokenType: IElementType) = when (tokenType) {
+        CaddyTypes.NUMBER -> NUMBER_KEYS
+        CaddyTypes.TEXT -> TEXT_KEYS
         CaddyTypes.COMMENT -> COMMENT_KEYS
         TokenType.BAD_CHARACTER -> BAD_CHAR_KEYS
         else -> EMPTY_KEYS
@@ -25,6 +27,12 @@ class CaddySyntaxHighlighter : SyntaxHighlighterBase() {
 
         private val COMMENT_KEYS = arrayOf(
             DefaultLanguageHighlighterColors.DOC_COMMENT
+        )
+        private val TEXT_KEYS = arrayOf(
+            DefaultLanguageHighlighterColors.STRING
+        )
+        private val NUMBER_KEYS = arrayOf(
+            DefaultLanguageHighlighterColors.NUMBER
         )
         private val EMPTY_KEYS = emptyArray<TextAttributesKey>()
     }
