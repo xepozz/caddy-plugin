@@ -33,6 +33,9 @@
         <lang.braceMatcher
                 language="Caddyfile"
                 implementationClass="com.github.xepozz.caddy.language.CaddyBraceMatcher"/>
+        <lang.commenter
+                language="Caddyfile"
+                implementationClass="com.github.xepozz.caddy.language.CaddyCommenter"/>
 
     </extensions>
 </idea-plugin>
