@@ -37,5 +37,9 @@
                 language="Caddyfile"
                 implementationClass="com.github.xepozz.caddy.language.CaddyCommenter"/>
 
+        <lang.documentationProvider
+                language="Caddyfile"
+                implementationClass="com.github.xepozz.caddy.language.documentation.CaddyDocumentationProvider"/>
+
     </extensions>
 </idea-plugin>
