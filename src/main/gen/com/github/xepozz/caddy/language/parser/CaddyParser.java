@@ -73,13 +73,13 @@ public class CaddyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // (LPAREN address RPAREN) | address
+  // (LPAREN address RPAREN) | address+
   public static boolean block_name(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "block_name")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, BLOCK_NAME, "<block name>");
     r = block_name_0(b, l + 1);
-    if (!r) r = address(b, l + 1);
+    if (!r) r = block_name_1(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
@@ -92,6 +92,21 @@ public class CaddyParser implements PsiParser, LightPsiParser {
     r = consumeToken(b, LPAREN);
     r = r && address(b, l + 1);
     r = r && consumeToken(b, RPAREN);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // address+
+  private static boolean block_name_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "block_name_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = address(b, l + 1);
+    while (r) {
+      int c = current_position_(b);
+      if (!address(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "block_name_1", c)) break;
+    }
     exit_section_(b, m, null, r);
     return r;
   }
