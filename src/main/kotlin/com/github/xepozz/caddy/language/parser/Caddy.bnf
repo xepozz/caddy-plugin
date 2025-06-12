@@ -33,7 +33,7 @@ private item_ ::= named_block | block | COMMENT | EOL
 
 named_block ::= block_name block
 
-block_name ::= (LPAREN address RPAREN) | address
+block_name ::= (LPAREN address RPAREN) | address+
 private address ::= IDENTIFIER | TEXT
 
 block ::= LBRACE EOL instructions RBRACE

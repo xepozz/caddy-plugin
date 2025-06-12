@@ -11,7 +11,6 @@ import com.intellij.psi.PsiElement
 
 class CaddyAnnotator : Annotator {
     override fun annotate(element: PsiElement, holder: AnnotationHolder) {
-        println("annotate $element")
         when (element) {
             is CaddyDirectiveImpl -> {
                 val nameElement = element.nameElement
@@ -50,11 +49,11 @@ class CaddyAnnotator : Annotator {
             DefaultLanguageHighlighterColors.STRING,
         )
         val REFERENCE_DECLARATION_HIGHLIGHT = TextAttributesKey.createTextAttributesKey(
-            "CADDY_PATTERN",
+            "CADDY_DIRECTIVE",
             DefaultLanguageHighlighterColors.FUNCTION_DECLARATION,
         )
         val REFERENCE_USAGE_HIGHLIGHT = TextAttributesKey.createTextAttributesKey(
-            "CADDY_PATTERN",
+            "CADDY_ARGUMENT",
             DefaultLanguageHighlighterColors.FUNCTION_CALL,
         )
         private val IDENTIFIER_HIGHLIGHT = TextAttributesKey.createTextAttributesKey(

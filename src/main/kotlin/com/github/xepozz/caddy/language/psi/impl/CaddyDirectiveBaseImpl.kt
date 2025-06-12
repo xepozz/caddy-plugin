@@ -15,12 +15,12 @@ abstract class CaddyDirectiveBaseImpl : CaddyDirective, CaddyElementImpl, PsiNam
     fun getNameElement(): PsiElement = this.node.findChildByType(CaddyTypes.IDENTIFIER)!!.psi
 
     override fun getText(): String {
-        val keyNode = this.node.findChildByType(CaddyTypes.TEXT)
+        val keyNode = this.node.findChildByType(CaddyTypes.IDENTIFIER)
 
         return keyNode?.text ?: ""
     }
 
-    override fun getName() = text
+    override fun getName(): String = text
 
     override fun setName(name: @NlsSafe String): PsiElement? {
         TODO("Not yet implemented")
