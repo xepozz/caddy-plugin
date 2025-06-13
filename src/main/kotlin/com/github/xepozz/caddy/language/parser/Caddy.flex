@@ -29,7 +29,7 @@ COMMENT = "#"[^\n]*
 // Identifier patterns
 IDENTIFIER = @?[a-zA-Z][a-zA-Z0-9_\-]*
 NUMBER = [0-9]+
-TEXT = [^\s{\}(\)\[\]<\>\|\#\"\'\`][^\s{\}(\)\[\]<\>]*
+TEXT = [^\s{\}(\)\[\]<\>\|\#\'\`][^\s{\}(\)\[\]<\>]*
 
 // Special symbols
 LBRACE = "{"
@@ -66,7 +66,7 @@ public void yypopState() {
 // Common elements
 {IDENTIFIER}                                 { return CaddyTypes.IDENTIFIER; }
 {NUMBER}                                     { return CaddyTypes.NUMBER; }
-{TEXT}                                       { return CaddyTypes.TEXT; }
+{TEXT}|\"([^\"\\]+)\"                        { return CaddyTypes.TEXT; }
 
 // Whitespace and comments
 {WHITESPACE}                                 { return TokenType.WHITE_SPACE; }
