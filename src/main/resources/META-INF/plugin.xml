@@ -41,5 +41,9 @@
                 language="Caddyfile"
                 implementationClass="com.github.xepozz.caddy.language.documentation.CaddyDocumentationProvider"/>
 
+        <lang.foldingBuilder
+                language="Caddyfile"
+                implementationClass="com.github.xepozz.caddy.language.CaddyFoldingBuilder"/>
+
     </extensions>
 </idea-plugin>
