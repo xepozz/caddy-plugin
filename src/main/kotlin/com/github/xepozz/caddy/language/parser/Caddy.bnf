@@ -6,6 +6,7 @@
   psiImplClassSuffix="Impl"
   psiPackage="com.github.xepozz.caddy.language.psi"
   psiImplPackage="com.github.xepozz.caddy.language.psi.impl"
+  psiImplUtilClass="com.github.xepozz.caddy.language.psi.impl.CaddyPsiImplUtil"
 
   elementTypeHolderClass="com.github.xepozz.caddy.language.psi.CaddyTypes"
   elementTypeClass="com.github.xepozz.caddy.language.psi.CaddyElementType"
@@ -34,7 +35,12 @@ private item_ ::= named_block | block | COMMENT | EOL
 named_block ::= block_name block
 
 block_name ::= (LPAREN address RPAREN) | address+
-private address ::= IDENTIFIER | TEXT
+address ::= IDENTIFIER | TEXT
+{
+  implements=["com.intellij.psi.NavigatablePsiElement" "com.intellij.psi.PsiLiteralValue"]
+  extends="com.github.xepozz.caddy.language.psi.impl.CaddyAddressBaseImpl"
+  methods=[getValue getReferences]
+}
 
 block ::= LBRACE EOL instructions RBRACE
 {
