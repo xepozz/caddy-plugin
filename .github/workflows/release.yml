@@ -1,101 +1,73 @@
-# GitHub Actions Workflow created for handling the release process based on the draft release prepared with the Build workflow.
-# Running the publishPlugin task requires all following secrets to be provided: PUBLISH_TOKEN, PRIVATE_KEY, PRIVATE_KEY_PASSWORD, CERTIFICATE_CHAIN.
-# See https://plugins.jetbrains.com/docs/intellij/plugin-signing.html for more information.
+name: Publish JetBrains Plugin
 
-name: Release
 on:
-  release:
-    types: [prereleased, released]
+  schedule:
+    - cron: '0 12 */3 * *'
+  workflow_dispatch:
 
 jobs:
-
-  # Prepare and publish the plugin to JetBrains Marketplace repository
-  release:
-    name: Publish Plugin
+  publish:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      pull-requests: write
     steps:
-
-      # Check out the current repository
-      - name: Fetch Sources
+      - name: Checkout Repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.release.tag_name }}
+          fetch-depth: 0
 
-      # Set up Java environment for the next steps
-      - name: Setup Java
+      - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          distribution: zulu
-          java-version: 21
+          java-version: '17'
+          distribution: 'jetbrains'
 
-      # Setup Gradle
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/gradle-build-action@v3
 
-      # Set environment variables
-      - name: Export Properties
-        id: properties
-        shell: bash
-        run: |
-          CHANGELOG="$(cat << 'EOM' | sed -e 's/^[[:space:]]*$//g' -e '/./,$!d'
-          ${{ github.event.release.body }}
-          EOM
-          )"
-          
-          echo "changelog<<EOF" >> $GITHUB_OUTPUT
-          echo "$CHANGELOG" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-
-      # Update the Unreleased section with the current release note
-      - name: Patch Changelog
-        if: ${{ steps.properties.outputs.changelog != '' }}
+      - name: Increment Version
+        id: version
         env:
-          CHANGELOG: ${{ steps.properties.outputs.changelog }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          ./gradlew patchChangelog --release-note="$CHANGELOG"
+          # Access current version from gradle.properties
+          CURRENT_VERSION=$(grep "pluginVersion=" gradle.properties | cut -d'=' -f2)
+          
+          # Splitting version
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT_VERSION"
+          
+          NEW_PATCH=$((PATCH + 1))
+          NEW_VERSION="${MAJOR}.${MINOR}.${NEW_PATCH}"
+          
+          # Replace original pluginVersion в gradle.properties
+          sed -i -e "s/pluginVersion=.*/pluginVersion=${NEW_VERSION}/g" gradle.properties
+          
+          # Export version number
+          echo "version=${NEW_VERSION}" >> "$GITHUB_OUTPUT"
 
-      # Publish the plugin to JetBrains Marketplace
+      - name: Create .env file
+        run: |
+          echo "PUBLISH_TOKEN=${{ secrets.JETBRAINS_PUBLISH_TOKEN }}" > .env
+
       - name: Publish Plugin
         env:
-          PUBLISH_TOKEN: ${{ secrets.PUBLISH_TOKEN }}
-          CERTIFICATE_CHAIN: ${{ secrets.CERTIFICATE_CHAIN }}
-          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
-          PRIVATE_KEY_PASSWORD: ${{ secrets.PRIVATE_KEY_PASSWORD }}
-        run: ./gradlew publishPlugin
-
-      # Upload artifact as a release asset
-      - name: Upload Release Asset
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload ${{ github.event.release.tag_name }} ./build/distributions/*
-
-      # Create a pull request
-      - name: Create Pull Request
-        if: ${{ steps.properties.outputs.changelog != '' }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PUBLISH_TOKEN: ${{ secrets.JETBRAINS_PUBLISH_TOKEN }}
         run: |
-          VERSION="${{ github.event.release.tag_name }}"
-          BRANCH="changelog-update-$VERSION"
-          LABEL="release changelog"
+          ./gradlew publishPlugin
 
-          git config user.email "action@github.com"
-          git config user.name "GitHub Action"
+      - name: Commit and push changes
+        uses: EndBug/add-and-commit@v9
+        with:
+          add: 'gradle.properties'
+          author_name: GitHub Actions
+          author_email: actions@github.com
+          message: "Bump version to ${{ steps.version.outputs.version }}"
+          tag: "v${{ steps.version.outputs.version }}"
 
-          git checkout -b $BRANCH
-          git commit -am "Changelog update - $VERSION"
-          git push --set-upstream origin $BRANCH
-          
-          gh label create "$LABEL" \
-            --description "Pull requests with release changelog update" \
-            --force \
-            || true
-
-          gh pr create \
-            --title "Changelog update - \`$VERSION\`" \
-            --body "Current pull request contains patched \`CHANGELOG.md\` file for the \`$VERSION\` version." \
-            --label "$LABEL" \
-            --head $BRANCH
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          generate_release_notes: true
+          files:
+            build/distributions/Robots.txt-${{ steps.version.outputs.version }}.zip
