@@ -47,24 +47,26 @@ block ::= LBRACE EOL instructions RBRACE
   pin=2
   recoverWhile=block_recover
 }
-private block_recover ::= !(COMMENT | IDENTIFIER | RBRACE | EOL)
+private block_recover ::= !(COMMENT | IDENTIFIER | SYMBOL | RBRACE | EOL)
 
 private instructions ::= (instruction? EOL)*
 
 instruction ::= directive | COMMENT
 
-directive ::= IDENTIFIER argument* block?
+directive ::= modifier? IDENTIFIER argument* block?
 {
-  pin=1
+  pin=2
   recoverWhile=directive_recover
   implements=["com.intellij.psi.NavigatablePsiElement" "com.intellij.psi.PsiNamedElement"]
   extends="com.github.xepozz.caddy.language.psi.impl.CaddyDirectiveBaseImpl"
 }
-private directive_recover ::= !(COMMENT | IDENTIFIER | EOL)
+private directive_recover ::= !(COMMENT | IDENTIFIER | TEXT | SYMBOL | EOL)
+
+modifier ::= SYMBOL
 
 argument ::= simple_value | env_value
 
-simple_value ::= TEXT | NUMBER | IDENTIFIER
+simple_value ::= SYMBOL | TEXT | NUMBER | IDENTIFIER
 
 env_value ::= LBRACE (TEXT|IDENTIFIER) RBRACE
 {
