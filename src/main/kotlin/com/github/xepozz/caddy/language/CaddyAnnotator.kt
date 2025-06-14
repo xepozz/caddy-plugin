@@ -1,6 +1,7 @@
 package com.github.xepozz.caddy.language
 
 import com.github.xepozz.caddy.language.psi.CaddyArgument
+import com.github.xepozz.caddy.language.psi.CaddyNamedBlock
 import com.github.xepozz.caddy.language.psi.impl.CaddyDirectiveImpl
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
@@ -40,6 +41,13 @@ class CaddyAnnotator : Annotator {
                         .create()
                 }
             }
+
+            is CaddyNamedBlock -> {
+                    holder.newSilentAnnotation(HighlightSeverity.INFORMATION)
+                        .range(element.blockName)
+                        .textAttributes(BLOCK_NAME_HIGHLIGHT)
+                        .create()
+            }
         }
     }
 
@@ -55,6 +63,10 @@ class CaddyAnnotator : Annotator {
         val REFERENCE_USAGE_HIGHLIGHT = TextAttributesKey.createTextAttributesKey(
             "CADDY_ARGUMENT",
             DefaultLanguageHighlighterColors.FUNCTION_CALL,
+        )
+        val BLOCK_NAME_HIGHLIGHT = TextAttributesKey.createTextAttributesKey(
+            "CADDY_BLOCK_NAME",
+            DefaultLanguageHighlighterColors.CLASS_NAME,
         )
         private val IDENTIFIER_HIGHLIGHT = TextAttributesKey.createTextAttributesKey(
             "CADDY_IDENTIFIER",

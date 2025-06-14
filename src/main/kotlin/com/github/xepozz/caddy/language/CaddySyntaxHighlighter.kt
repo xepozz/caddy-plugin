@@ -14,7 +14,7 @@ class CaddySyntaxHighlighter : SyntaxHighlighterBase() {
 
     override fun getTokenHighlights(tokenType: IElementType) = when (tokenType) {
         CaddyTypes.NUMBER -> NUMBER_KEYS
-        CaddyTypes.TEXT -> TEXT_KEYS
+//        CaddyTypes.TEXT -> TEXT_KEYS
         CaddyTypes.COMMENT -> COMMENT_KEYS
         TokenType.BAD_CHARACTER -> BAD_CHAR_KEYS
         else -> EMPTY_KEYS
