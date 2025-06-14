@@ -24,6 +24,9 @@
     IDENTIFIER = "IDENTIFIER"
     NUMBER = "NUMBER"
     TEXT = "TEXT"
+    HEREDOC_START = "HEREDOC_START"
+    HEREDOC_CONTENT = "HEREDOC_CONTENT"
+    HEREDOC_END = "HEREDOC_END"
   ]
 }
 
@@ -64,13 +67,18 @@ private directive_recover ::= !(COMMENT | IDENTIFIER | TEXT | SYMBOL | EOL)
 
 modifier ::= SYMBOL
 
-argument ::= simple_value | env_value
+argument ::= simple_value | env_value | heredoc
 
 simple_value ::= SYMBOL | TEXT | NUMBER | IDENTIFIER
 
 env_value ::= LBRACE (TEXT|IDENTIFIER) RBRACE
 {
   pin=2
+}
+
+heredoc ::= HEREDOC_START HEREDOC_CONTENT* HEREDOC_END
+{
+  pin=1
 }
 
 //private instruction_recover ::= !(TEXT | RBRACE)

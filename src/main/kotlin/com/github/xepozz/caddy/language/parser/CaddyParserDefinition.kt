@@ -19,7 +19,7 @@ internal class CaddyParserDefinition : ParserDefinition {
 
     override fun getWhitespaceTokens(): TokenSet = CaddyTokenSets.WHITESPACES
 
-    override fun getStringLiteralElements(): TokenSet = TokenSet.EMPTY
+    override fun getStringLiteralElements(): TokenSet = CaddyTokenSets.STRING_LITERALS
 
     override fun createParser(project: Project?) = CaddyParser()
 
