@@ -49,5 +49,7 @@
                 language="Caddyfile"
                 implementationClass="com.github.xepozz.caddy.language.completion.CaddyCompletionContributor"/>
 
+        <multiHostInjector
+                implementation="com.github.xepozz.caddy.language.injection.CaddyHeredocLanguageInjector"/>
     </extensions>
 </idea-plugin>

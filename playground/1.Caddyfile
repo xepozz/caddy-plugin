@@ -2,9 +2,34 @@
 	auto_https disable_redirects
 }
 
+example.com {
+	respond <<HTML
+		<html>
+		  <head><title>Foo</title></head>
+		  <body>Foo</body>
+		  HTML
+		</html>
+		HTML 200
+}
+
+example {
+    respond <<HTML
+    <div> hi!
+    </div>
+    HTML
+}
+
 example.com:443 {
 	# Application Root
 	root * /var/www/pterodactyl/
+
+    directive abc def
+    directive "abc def"
+    directive "\"abc def\""
+#    directive `{"foo": "bar"}`
+
+    directive "first line
+        second line"
 
 	# Enable the file server (required for assets to be served)
 	file_server
@@ -36,7 +61,7 @@ example.com:443 {
 	}
 
 	# ?
-	rewrite @startsWithDot /index.php{uri}
+	rewrite @startsWithDot /index.php{http.request.body}
 
 	# ?
 	@phpRewrite {

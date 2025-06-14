@@ -79,6 +79,9 @@ env_value ::= LBRACE (TEXT|IDENTIFIER) RBRACE
 heredoc ::= HEREDOC_START HEREDOC_CONTENT* HEREDOC_END
 {
   pin=1
+  implements=["com.intellij.psi.PsiLanguageInjectionHost" "com.intellij.psi.PsiLiteralValue"]
+  extends="com.github.xepozz.caddy.language.psi.impl.CaddyHeredocContentImpl"
+  methods=[isValidHost updateText createLiteralTextEscaper]
 }
 
 //private instruction_recover ::= !(TEXT | RBRACE)

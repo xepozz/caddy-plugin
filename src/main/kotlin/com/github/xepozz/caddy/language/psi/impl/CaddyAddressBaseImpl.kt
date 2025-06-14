@@ -9,7 +9,7 @@ import com.intellij.psi.PsiLiteralValue
 abstract class CaddyAddressBaseImpl : CaddyAddress, CaddyElementImpl, PsiLiteralValue {
     constructor(node: ASTNode) : super(node)
 
-    override fun getValue(): String? = text
+    override fun getValue(): String? = CaddyPsiImplUtil.getValue(this)
 
     override fun getText(): String? = node.text
 

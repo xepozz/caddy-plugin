@@ -5,6 +5,13 @@ example.com {
     text/html; charset=utf-8
     EOF
 
+    respond <<HTML
+        <html>
+          <head><title>Foo</title></head>
+          <body>Fowo</body>
+        </html>
+        HTML 200
+
     respond /api/* <<JSON
     {
         "status": "success",
