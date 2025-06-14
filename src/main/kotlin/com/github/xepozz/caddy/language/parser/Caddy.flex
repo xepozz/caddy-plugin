@@ -35,6 +35,8 @@ SYMBOL = [\-\+\~\?\<\>\@]
 
 // Heredoc patterns
 HEREDOC_START = "<<"[a-zA-Z0-9_\-]+
+QUOTTED_STRING = "\""(\\\"|[^\"])*"\""
+BACKTICK_STRING = "`"(\\\`|[^\`])*"`"
 
 // Special symbols
 LBRACE = "{"
@@ -147,7 +149,7 @@ public String processHeredocContent(String text) {
 {IDENTIFIER}                                 { return CaddyTypes.IDENTIFIER; }
 {NUMBER}                                     { return CaddyTypes.NUMBER; }
 {SYMBOL}                                     { return CaddyTypes.SYMBOL; }
-{TEXT}|\"([^\"\\]+)\"                        { return CaddyTypes.TEXT; }
+{TEXT}|{QUOTTED_STRING}|{BACKTICK_STRING}    { return CaddyTypes.TEXT; }
 
 // Whitespace and comments
 {WHITESPACE}                                 { return TokenType.WHITE_SPACE; }
