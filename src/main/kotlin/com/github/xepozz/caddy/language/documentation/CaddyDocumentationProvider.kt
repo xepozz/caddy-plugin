@@ -1,17 +1,17 @@
 package com.github.xepozz.caddy.language.documentation
 
+import com.github.xepozz.caddy.DirectivesDictionary
 import com.github.xepozz.caddy.language.psi.CaddyDirective
 import com.intellij.lang.documentation.AbstractDocumentationProvider
 import com.intellij.markdown.utils.lang.CodeBlockHtmlSyntaxHighlighter
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiManager
 
 class CaddyDocumentationProvider : AbstractDocumentationProvider() {
     override fun getQuickNavigateInfo(element: PsiElement?, originalElement: PsiElement?): String? {
         if (element !is CaddyDirective) return null
 
         val directiveName = element.name!!
-        val doc = CaddyDirectiveDocumentation.getDocumentation(directiveName) ?: return null
+        val doc = DirectivesDictionary.getDocumentation(directiveName) ?: return null
 
         return doc.description
     }
@@ -20,7 +20,7 @@ class CaddyDocumentationProvider : AbstractDocumentationProvider() {
         if (element !is CaddyDirective) return null
 
         val directiveName = element.name!!
-        val doc = CaddyDirectiveDocumentation.getDocumentation(directiveName) ?: return null
+        val doc = DirectivesDictionary.getDocumentation(directiveName) ?: return null
 
         return buildString {
             append("<div class='definition'><pre>")

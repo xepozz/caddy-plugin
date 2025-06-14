@@ -1,7 +1,9 @@
-package com.github.xepozz.caddy.language.documentation
+package com.github.xepozz.caddy
 
-object CaddyDirectiveDocumentation {
-    private val documentationMap = mapOf(
+import com.github.xepozz.caddy.language.documentation.CaddyDirectiveDoc
+
+object DirectivesDictionary {
+    val directives = mapOf(
         "abort" to CaddyDirectiveDoc(
             name = "abort",
             description = "Aborts the HTTP request with a specific error message and status code.",
@@ -564,10 +566,6 @@ object CaddyDirectiveDocumentation {
     )
 
     fun getDocumentation(directiveName: String): CaddyDirectiveDoc? {
-        return documentationMap[directiveName]
-    }
-
-    fun getAllDirectiveNames(): Set<String> {
-        return documentationMap.keys
+        return directives[directiveName]
     }
 }
