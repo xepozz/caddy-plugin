@@ -1,0 +1,25 @@
+example.com {
+    root * /var/www/html
+
+    header Content-Type <<EOF
+    text/html; charset=utf-8
+    EOF
+
+    respond /api/* <<JSON
+    {
+        "status": "success",
+        "message": "This is a JSON response",
+        "data": {
+            "key1": "value1",
+            "key2": "value2"
+        }
+    }
+    JSON
+
+    handle_path /docs/* {
+        rewrite * /docs/index.html
+        header Content-Type <<TEXT
+        text/html; charset=utf-8
+        TEXT
+    }
+}
