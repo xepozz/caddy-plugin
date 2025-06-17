@@ -6,8 +6,8 @@ import com.intellij.lang.ASTNode
 import com.intellij.lang.Language
 import com.intellij.lang.injection.MultiHostInjector
 import com.intellij.lang.injection.MultiHostRegistrar
-import com.intellij.lang.tree.util.children
 import com.intellij.psi.PsiElement
+import com.intellij.psi.tree.TokenSet
 
 class CaddyHeredocLanguageInjector : MultiHostInjector {
     override fun elementsToInjectIn() = mutableListOf(CaddyHeredoc::class.java)
@@ -18,10 +18,9 @@ class CaddyHeredocLanguageInjector : MultiHostInjector {
 //            println("PsiElement is not a CaddyHeredoc")
             return
         }
-        val childrenNodes = context.node.children().toList()
 //        println("children = $childrenNodes")
 
-        val heredocStart = childrenNodes.first()
+        val heredocStart = context.node.firstChildNode
 
         val marker = extractMarkerFromHeredocStart(heredocStart)
         val language = findLanguageByMarker(marker)
@@ -59,8 +58,7 @@ class CaddyHeredocLanguageInjector : MultiHostInjector {
 
     private fun collectHeredocContent(heredocStart: CaddyHeredoc): Collection<PsiElement> =
         heredocStart.node
-            .children()
-            .filter { it.elementType === CaddyTypes.HEREDOC_CONTENT }
+            .getChildren(TokenSet.create(CaddyTypes.HEREDOC_CONTENT))
             .mapNotNull { it.psi }
             .toList()
 }
