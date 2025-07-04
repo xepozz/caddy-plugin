@@ -14,7 +14,7 @@ class CaddyAnnotator : Annotator {
     override fun annotate(element: PsiElement, holder: AnnotationHolder) {
         when (element) {
             is CaddyDirectiveImpl -> {
-                val nameElement = element.nameElement
+                val nameElement = element.getNameElement()
                 when {
                     nameElement.text.startsWith("@") -> {
                         holder.newSilentAnnotation(HighlightSeverity.INFORMATION)
